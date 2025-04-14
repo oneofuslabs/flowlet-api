@@ -9,7 +9,7 @@ export const errorHandler = (
   err: ApiError,
   req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
   console.error("Error:", err);
 
@@ -29,7 +29,7 @@ export const errorHandler = (
 export const notFoundHandler = (
   req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
   res.status(404).json({
     success: false,

@@ -72,3 +72,25 @@ To apply migrations:
 ```
 npm run migrate
 ```
+
+## ESLint Configuration
+
+This project uses ESLint to enforce code quality and identify potential issues. It is configured to:
+
+- Check for unused variables (with special handling for parameters prefixed with underscore)
+- Display errors in the console during development
+- Block commits when ESLint errors are detected
+
+### Development Mode
+
+When running `npm run dev`, ESLint will run in watch mode alongside the development server, showing any linting errors in real-time.
+
+### Pre-commit Hooks
+
+The project uses Husky and lint-staged to run ESLint checks before each commit. If any errors are found, the commit will be prevented until they are fixed.
+
+To manually run the linting check:
+
+```
+npm run lint
+```
