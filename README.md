@@ -94,3 +94,30 @@ To manually run the linting check:
 ```
 npm run lint
 ```
+
+## Testing
+
+This project uses Jest for unit testing. Tests are located in the `test` directory.
+
+### Running Tests
+
+Run all tests:
+
+```
+npm test
+```
+
+Run tests in CI mode (faster, without coverage):
+
+```
+npm run test:ci
+```
+
+### Pre-commit Hook
+
+The pre-commit hook runs both ESLint and tests. If any of the following conditions are met, the commit will be blocked:
+
+1. There are ESLint errors in any of the staged TypeScript files
+2. Any test fails
+
+This ensures that only code that passes both linting and tests can be committed.
