@@ -7,7 +7,7 @@ const router = Router();
 
 // Public routes
 router.post("/register", async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { email, password, metadata } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required" });
@@ -15,7 +15,11 @@ router.post("/register", async (req: Request, res: Response) => {
 
   try {
     // Use service role to bypass RLS
-    const { data: userData, error } = await createUser(email, password);
+    const { data: userData, error } = await createUser(
+      email,
+      password,
+      metadata,
+    );
 
     if (error) {
       return res.status(400).json({ message: error.message });

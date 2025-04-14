@@ -1,9 +1,16 @@
 import { supabase } from "../config/supabase";
 
-export const createUser = async (email: string, password: string) =>
+export const createUser = async (
+  email: string,
+  password: string,
+  metadata: object,
+) =>
   await supabase.auth.admin.createUser({
     email,
     password,
+    app_metadata: {
+      ...metadata,
+    },
   });
 
 export const login = async (email: string, password: string) =>
