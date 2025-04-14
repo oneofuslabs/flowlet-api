@@ -13,7 +13,9 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "*.ts": "eslint --max-warnings=0"
+    "src/**/*.ts": [
+      "eslint --max-warnings=0"
+    ]
   },
   "keywords": [],
   "author": "",
