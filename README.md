@@ -85,12 +85,6 @@ This project uses ESLint to enforce code quality and identify potential issues. 
 
 When running `npm run dev`, ESLint will run in watch mode alongside the development server, showing any linting errors in real-time.
 
-### Pre-commit Hooks
-
-The project uses Husky and lint-staged to run ESLint checks before each commit. If any errors are found, the commit will be prevented until they are fixed.
-
-To manually run the linting check:
-
 ```
 npm run lint
 ```
@@ -113,7 +107,9 @@ Run tests in CI mode (faster, without coverage):
 npm run test:ci
 ```
 
-### Pre-commit Hook
+### Pre-commit Hooks
+
+The project uses Husky and lint-staged to run ESLint checks before each commit.
 
 The pre-commit hook runs both ESLint and tests. If any of the following conditions are met, the commit will be blocked:
 
@@ -121,3 +117,5 @@ The pre-commit hook runs both ESLint and tests. If any of the following conditio
 2. Any test fails
 
 This ensures that only code that passes both linting and tests can be committed.
+
+To manually run the linting check:
