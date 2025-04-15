@@ -107,7 +107,7 @@ Run tests in CI mode (faster, without coverage):
 npm run test:ci
 ```
 
-### Pre-commit Hooks
+## Pre-commit Hooks
 
 The project uses Husky and lint-staged to run ESLint checks before each commit.
 
@@ -118,4 +118,16 @@ The pre-commit hook runs both ESLint and tests. If any of the following conditio
 
 This ensures that only code that passes both linting and tests can be committed.
 
-To manually run the linting check:
+## GitHub Actions Workflow Setup
+
+This directory contains GitHub Actions workflows for this project.
+
+### PR Checks Workflow
+
+The `pr-checks.yml` workflow runs on every pull request to main/master branches and:
+
+1. Runs ESLint to check code quality
+2. Runs Jest tests to ensure all tests pass
+3. Uploads test coverage reports as artifacts
+
+This ensures PRs cannot be merged unless all linting and tests pass.
