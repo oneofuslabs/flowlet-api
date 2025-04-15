@@ -1,4 +1,4 @@
-# Flowless API
+# Flowlet API
 
 Express.js API with TypeScript and Supabase integration.
 

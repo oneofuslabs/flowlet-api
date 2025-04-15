@@ -35,12 +35,12 @@ app.use("/api/users", usersRoutes);
 
 // Health check route
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok", message: "Flowless API is running" });
+  res.status(200).json({ status: "ok", message: "Flowlet API is running" });
 });
 
 // Default route
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Welcome to Flowless API!" });
+  res.status(200).json({ message: "Welcome to Flowlet API!" });
 });
 
 // Error handling
