@@ -2,12 +2,15 @@
 -- Note: This is auto-created by Supabase, but we're adding it here for documentation
 
 -- Create profiles table
-CREATE TABLE IF NOT EXISTS profiles (
-  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  name TEXT,
-  avatar_url TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()) NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()) NOT NULL
+create table public.profiles (
+    id uuid references auth.users on delete cascade,
+    email text unique,
+    full_name text,
+    avatar_url text,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    preferences jsonb default '{}'::jsonb,
+    primary key (id)
 );
 
 -- Create RLS policies for profiles
@@ -16,19 +19,22 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
 
 -- Create a trigger to create profiles when users are created
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO profiles (id, name)
-  VALUES (NEW.id, NEW.raw_user_meta_data->>'name');
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, email)
+  values (
+    new.id,
+    new.email
+  );
+  return new;
+end;
+$$ language plpgsql security definer;
 
 -- Create a trigger to create profiles when users are created
-CREATE OR REPLACE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
 
 -- Create a function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()

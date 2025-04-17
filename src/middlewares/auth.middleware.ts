@@ -1,12 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { getUser } from "../services/auth.service";
+import { Session, User } from "@supabase/supabase-js";
 
 export interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    email?: string;
-    role?: string;
-  };
+  user?: User;
+  session?: Session;
 }
 
 export const authMiddleware = async (
@@ -35,11 +33,7 @@ export const authMiddleware = async (
     }
 
     // Attach the user to the request object for later use
-    req.user = {
-      id: data.user.id,
-      email: data.user.email,
-      // Add any other user data you need
-    };
+    req.user = data.user;
 
     next();
   } catch (error) {

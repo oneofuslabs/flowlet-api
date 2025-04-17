@@ -30,8 +30,8 @@ app.use(helmet());
 app.use(morgan("dev"));
 
 // Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/users", usersRoutes);
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", usersRoutes);
 
 // Health check route
 app.get("/health", (req, res) => {
