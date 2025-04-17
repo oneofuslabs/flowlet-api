@@ -1,13 +1,18 @@
 import { Request, Response, Router } from "express";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
-import { createUser, login, resetPassword } from "../services/auth.service";
+import {
+  createUser,
+  login,
+  resetPassword,
+  resetPasswordRequest,
+} from "../services/auth.service";
 import { authMiddleware } from "../middlewares/auth.middleware";
 
 const router = Router();
 
 // Public routes
 router.post("/register", async (req: Request, res: Response) => {
-  const { email, password, metadata } = req.body;
+  const { email, password, full_name } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required" });
@@ -18,7 +23,7 @@ router.post("/register", async (req: Request, res: Response) => {
     const { data: userData, error } = await createUser(
       email,
       password,
-      metadata,
+      full_name,
     );
 
     if (error) {
@@ -74,7 +79,7 @@ router.post("/login", async (req: Request, res: Response) => {
   }
 });
 
-router.post("/reset-password", async (req: Request, res: Response) => {
+router.post("/forgot-password", async (req: Request, res: Response) => {
   const { email } = req.body;
 
   if (!email) {
@@ -82,7 +87,7 @@ router.post("/reset-password", async (req: Request, res: Response) => {
   }
 
   try {
-    const { error } = await resetPassword(email);
+    const { error } = await resetPasswordRequest(email);
 
     if (error) {
       return res.status(400).json({ message: error.message });
@@ -95,6 +100,22 @@ router.post("/reset-password", async (req: Request, res: Response) => {
       .status(500)
       .json({ message: "Server error during password reset" });
   }
+});
+
+router.post("/reset-password", async (req: Request, res: Response) => {
+  const { password } = req.body;
+
+  if (!password) {
+    return res.status(400).json({ message: "Password is required" });
+  }
+
+  const { error } = await resetPassword(password);
+
+  if (error) {
+    return res.status(400).json({ message: error.message });
+  }
+
+  return res.status(200).json({ message: "Password reset successful" });
 });
 
 // Protected routes
