@@ -29,7 +29,7 @@ export const mockExchangeRates = {
   USDT: 1,
 };
 
-type Transaction = {
+export type Transaction = {
   id: string;
   fromAmount: number;
   fromCurrency: string;
@@ -40,6 +40,8 @@ type Transaction = {
   transactionHash: string;
   type: "user" | "rule";
   ruleId?: string;
+  created_at: Date;
+  updated_at: Date;
 };
 
 export const mockTransactions: Transaction[] = [
@@ -53,6 +55,8 @@ export const mockTransactions: Transaction[] = [
     transactionStatus: "pending",
     transactionHash: "0x1234567890abcdef",
     type: "user",
+    created_at: new Date("2025-01-01"),
+    updated_at: new Date("2025-01-01"),
   },
   {
     id: "2",
@@ -64,6 +68,8 @@ export const mockTransactions: Transaction[] = [
     transactionStatus: "pending",
     transactionHash: "0x1234567890abcdef",
     type: "user",
+    created_at: new Date("2025-02-01"),
+    updated_at: new Date("2025-02-01"),
   },
   {
     id: "3",
@@ -76,11 +82,15 @@ export const mockTransactions: Transaction[] = [
     transactionHash: "0x1234567890abcdef",
     type: "rule",
     ruleId: "1",
+    created_at: new Date("2025-03-12"),
+    updated_at: new Date("2025-03-12"),
   },
 ];
 
 export type Rule = {
-  ruleId: string;
+  id: string;
+  name: string;
+  description: string;
   fromCurrency: string;
   fromAmount: number;
   toCurrency?: string;
@@ -97,7 +107,7 @@ export type Rule = {
   updated_at: Date;
 };
 
-export const mockRules = [
+export const mockRules: Rule[] = [
   {
     id: "1",
     name: "Buy ETH",
@@ -106,8 +116,10 @@ export const mockRules = [
     fromAmount: 100,
     toCurrency: "ETH",
     threshold: 0.00038,
-    active: true,
+    status: "active",
     thresholdDirection: "below",
+    created_at: new Date("2025-01-01"),
+    updated_at: new Date("2025-01-01"),
   },
   {
     id: "2",
@@ -117,11 +129,13 @@ export const mockRules = [
     fromAmount: 100,
     toCurrency: "USDT",
     threshold: 0.00046,
-    active: true,
     thresholdDirection: "above",
+    status: "active",
+    created_at: new Date("2025-01-01"),
+    updated_at: new Date("2025-01-01"),
   },
   {
-    id: 3,
+    id: "3",
     name: "Weekly transfer to Mom",
     description: "Transfer 100 USDT to Mom every week",
     fromCurrency: "USDT",
@@ -131,5 +145,7 @@ export const mockRules = [
     status: "active",
     startDate: new Date("2025-01-01"),
     endDate: new Date("2025-12-31"),
+    created_at: new Date("2025-01-01"),
+    updated_at: new Date("2025-01-01"),
   },
 ];
