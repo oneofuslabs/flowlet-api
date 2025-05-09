@@ -5,12 +5,18 @@ import {
 } from "../middlewares/auth.middleware";
 import { Profile } from "../types/database.types";
 import { getUserProfile, updateUserProfile } from "../services/user.service";
+import {
+  mockExchangeRates,
+  mockRules,
+  mockTransactions,
+  mockWallet,
+} from "../utils/mock";
 const router = Router();
 
 // All routes are protected by authentication
 router.use(authMiddleware);
 
-// GET /api/users/profile - Get user profile
+// GET /api/v1/users/profile - Get user profile
 router.get("/profile", async (
   req: AuthenticatedRequest,
   res: Response,
@@ -26,14 +32,27 @@ router.get("/profile", async (
       return res.status(404).json({ message: "Profile not found" });
     }
 
-    return res.status(200).json({ profile: data });
+    return res.status(200).json(data);
   } catch (error) {
     console.error("Get profile error:", error);
     return res.status(500).json({ message: "Server error fetching profile" });
   }
 });
 
-// PATCH /api/users/profile - Update user profile
+// GET /api/v1/users/config - Get wallet, rules, transactions, and exchange rates
+router.get("/config", async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  return res.status(200).json({
+    wallet: mockWallet,
+    rules: mockRules,
+    transactions: mockTransactions,
+    exchangeRates: mockExchangeRates,
+  });
+});
+
+// PATCH /api/v1/users/profile - Update user profile
 router.patch("/profile", async (
   req: AuthenticatedRequest,
   res: Response,
