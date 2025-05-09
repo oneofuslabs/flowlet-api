@@ -1,8 +1,8 @@
-import { supabase } from "../config/supabase";
+import { getSupabase, supabase } from "../config/supabase";
 import { Profile } from "../types/database.types";
 
 export const getUserProfile = async (userId: string) =>
-  await supabase
+  await getSupabase()
     .from("profiles")
     .select("*")
     .eq("id", userId)

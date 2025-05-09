@@ -35,7 +35,7 @@ export const authMiddleware = async (
     // Attach the user to the request object for later use
     req.user = data.user;
 
-    next();
+    return next();
   } catch (error) {
     console.error("Auth middleware error:", error);
     return res

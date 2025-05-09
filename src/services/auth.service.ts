@@ -1,11 +1,11 @@
-import { supabase } from "../config/supabase";
+import { getSupabase } from "../config/supabase";
 
 export const createUser = async (
   email: string,
   password: string,
   full_name: string | undefined,
 ) =>
-  await supabase.auth.signUp({
+  await getSupabase().auth.signUp({
     email,
     password,
     options: {
@@ -15,20 +15,22 @@ export const createUser = async (
   });
 
 export const login = async (email: string, password: string) =>
-  await supabase.auth.signInWithPassword({
+  await getSupabase().auth.signInWithPassword({
     email,
     password,
   });
 
 export const resetPasswordRequest = async (email: string) =>
-  await supabase.auth.resetPasswordForEmail(email, {
+  await getSupabase().auth.resetPasswordForEmail(email, {
     redirectTo: process.env.PASSWORD_RESET_REDIRECT_URL,
   });
 
 export const resetPassword = async (password: string) =>
-  await supabase.auth.updateUser({
+  await getSupabase().auth.updateUser({
     password,
   });
 
 export const getUser = async (token: string) =>
-  await supabase.auth.getUser(token);
+  await getSupabase().auth.getUser(token);
+
+export const getSession = async () => await getSupabase().auth.getSession();

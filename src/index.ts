@@ -3,7 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import { supabase } from "./config/supabase";
+import { getSupabase } from "./config/supabase";
 import { validateEnv } from "./utils/validateEnv";
 
 // Load environment variables
@@ -52,8 +52,8 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 
   // Test Supabase connection
-  supabase.auth
-    .getSession()
+  getSupabase()
+    .auth.getSession()
     .then(() => console.log("Successfully connected to Supabase"))
     .catch((err) => console.error("Error connecting to Supabase:", err));
 });
