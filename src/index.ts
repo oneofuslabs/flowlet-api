@@ -40,7 +40,7 @@ app.get("/health", (req, res) => {
 
 // Default route
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Welcome to Flowlet API!" });
+  res.status(200).json({ message: "Welcome to Flowlet API 0.0.1!" });
 });
 
 // Error handling
