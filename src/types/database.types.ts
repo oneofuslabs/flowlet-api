@@ -12,6 +12,15 @@ export interface User {
   role?: string;
 }
 
+export interface Trade {
+  id: string;
+  fromCurrency: string | null;
+  toCurrency: string | null;
+  amount: number | null;
+  txHash: string | null;
+  create_at: Date;
+}
+
 export interface Database {
   public: {
     Tables: {

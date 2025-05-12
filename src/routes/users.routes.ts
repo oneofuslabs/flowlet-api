@@ -9,8 +9,11 @@ import {
   mockExchangeRates,
   mockRules,
   mockTransactions,
-  mockWallet,
 } from "../utils/mock";
+
+import { Connection, PublicKey, clusterApiUrl, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { getAssociatedTokenAddress, getAccount } from "@solana/spl-token";
+
 const router = Router();
 
 // All routes are protected by authentication
@@ -44,8 +47,32 @@ router.get("/config", async (
   req: AuthenticatedRequest,
   res: Response,
 ) => {
+
+  const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+  const ata = await getAssociatedTokenAddress(new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"), new PublicKey("DG34bJWRt5CM2dVdi6b9mXzmMZRmBPhEm3UcUNEhNnab"));
+  const accountInfo = await getAccount(connection, ata);
+  const balanceUSDC = Number(accountInfo.amount) / 10 ** 6;
+  const solLamports = await connection.getBalance(new PublicKey("DG34bJWRt5CM2dVdi6b9mXzmMZRmBPhEm3UcUNEhNnab"));
+  const balanceSOL = solLamports / LAMPORTS_PER_SOL;
+
+  const walletInfo = {
+    address: "DG34bJWRt5CM2dVdi6b9mXzmMZRmBPhEm3UcUNEhNnab",
+    privateKey:
+      "0x9b5e19fc2dd8f486b213768e245c70571e9bcb5b6c1ab38ea2f439d210b7262a",
+    balance: [
+      {
+        currency: "SOL",
+        amount: balanceSOL,
+      },
+      {
+        currency: "USDC",
+        amount: balanceUSDC * 100,
+      },
+    ],
+  };
+
   return res.status(200).json({
-    wallet: mockWallet,
+    wallet: walletInfo,
     rules: mockRules,
     transactions: mockTransactions,
     exchangeRates: mockExchangeRates,
