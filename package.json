@@ -30,7 +30,15 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "helmet": "^7.1.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "@raydium-io/raydium-sdk-v2": "0.1.132-alpha",
+    "@solana/spl-token": "^0.4.6",
+    "@solana/web3.js": "^1.95.3",
+    "@triton-one/yellowstone-grpc": "^1.2.0",
+    "bs58": "^5.0.0",
+    "decimal.js": "^10.4.3",
+    "@types/jsonfile": "^6.1.4",
+    "@types/node-cron": "^3.0.11"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

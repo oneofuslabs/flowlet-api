@@ -26,7 +26,7 @@ export const mockExchangeRates = {
   ETH: 0.00043,
   BTC: 0.0000097,
   SOL: 0.0058,
-  USDT: 1,
+  USDC: 1,
 };
 
 export type Transaction = {
@@ -50,7 +50,7 @@ export const mockTransactions: Transaction[] = [
     fromAmount: 100,
     fromCurrency: "ETH",
     toCurrency: "USDT",
-    toAmount: 100 * (mockExchangeRates.USDT / mockExchangeRates.ETH),
+    toAmount: 100 * (mockExchangeRates.USDC / mockExchangeRates.ETH),
     transactionDate: new Date("2025-01-01"),
     transactionStatus: "pending",
     transactionHash: "0x1234567890abcdef",
@@ -63,7 +63,7 @@ export const mockTransactions: Transaction[] = [
     fromAmount: 40,
     fromCurrency: "USDT",
     toCurrency: "BTC",
-    toAmount: 40 * (mockExchangeRates.BTC / mockExchangeRates.USDT),
+    toAmount: 40 * (mockExchangeRates.BTC / mockExchangeRates.USDC),
     transactionDate: new Date("2025-01-01"),
     transactionStatus: "pending",
     transactionHash: "0x1234567890abcdef",
