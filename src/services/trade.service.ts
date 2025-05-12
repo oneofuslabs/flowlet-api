@@ -1,5 +1,4 @@
-import { getSupabase, supabase } from "../config/supabase";
-import { Trade } from "../types/database.types";
+import { getSupabase } from "../config/supabase";
 
 export const getLastTrade = async () =>
   await getSupabase()

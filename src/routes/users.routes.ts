@@ -9,7 +9,6 @@ import {
   mockExchangeRates,
   mockRules,
   mockTransactions,
-  mockWallet,
 } from "../utils/mock";
 
 import { Connection, PublicKey, clusterApiUrl, LAMPORTS_PER_SOL } from "@solana/web3.js";

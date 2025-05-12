@@ -2,13 +2,11 @@ import { Response, Router } from "express";
 import { saveTrade, getLastTrade } from "../services/trade.service";
 
 import {
-  USDCMint,
   toFeeConfig,
   toApiV3Token,
   TokenAmount,
   Token,
   DEVNET_PROGRAM_ID,
-  printSimulate,
   setLoggerLevel,
   LogLevel,
 } from '@raydium-io/raydium-sdk-v2'
@@ -16,13 +14,6 @@ import { PublicKey, Connection, clusterApiUrl } from '@solana/web3.js'
 import { getAccount, getAssociatedTokenAddress, NATIVE_MINT, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
 import { initSdk, txVersion } from "../config/raydium";
 import { readCachePoolData, writeCachePoolData } from '../utils/raydiumPoolCache';
-
-const poolType: Record<number, string> = {
-  4: 'AMM',
-  5: 'AMM Stable',
-  6: 'CLMM',
-  7: 'CPMM',
-}
 
 setLoggerLevel('Raydium_tradeV2', LogLevel.Debug)
 
@@ -137,7 +128,7 @@ router.post("/swap", async (
     output: targetRoute.amountOut.amount.toExact(),
     minimumOut: targetRoute.minAmountOut.amount.toExact(),
     swapType: targetRoute.routeType,
-    routes: targetRoute.poolInfoList.map((p) => `${poolType[p.version]} ${p.id} ${(p as any).status}`).join(` -> `),
+    //routes: targetRoute.poolInfoList.map((p) => `${poolType[p.version]} ${p.id} ${(p as any).status}`).join(` -> `),
   });
 
   console.log('fetching swap route pool keys..');
@@ -148,7 +139,7 @@ router.post("/swap", async (
   });
 
   console.log('build swap tx..');
-  const { execute, transactions } = await raydium.tradeV2.swap({
+  const { execute } = await raydium.tradeV2.swap({
     //routeProgram: Router,
     routeProgram: new PublicKey("BVChZ3XFEwTMUk1o9i3HAf91H6mFxSwa5X2wFAWhYPhU"),
     txVersion,
@@ -204,11 +195,13 @@ router.get("/swap", async (
     balance = Number(accountInfo.amount) / 10 ** 6;
 
     console.log(`💰 Wallet'taki USDC (devnet) miktarı: ${balance} USDC`);
-  } catch (err: any) {
-    if (err.message.includes("Invalid account owner") || err.message.includes("Failed to find account")) {
-      console.log("📭 Bu wallet'ta devnet USDC bakiyesi yok (ATA bulunamadı).");
-    } else {
-      console.error("🚨 Hata:", err);
+  } catch (err) {
+    if( err instanceof Error){
+      if (err.message.includes("Invalid account owner") || err.message.includes("Failed to find account")) {
+        console.log("📭 Bu wallet'ta devnet USDC bakiyesi yok (ATA bulunamadı).");
+      } else {
+        console.error("🚨 Hata:", err);
+      }
     }
   }
 
