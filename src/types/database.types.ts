@@ -21,6 +21,17 @@ export interface Trade {
   create_at: Date;
 }
 
+export interface Transfer {
+  id: string;
+  fromWallet: string | null;
+  toWallet: string | null;
+  tokenName: string | null;
+  tokenAddress: string | null;
+  amount: number | null;
+  txHash: string | null;
+  create_at: Date;
+}
+
 export interface Database {
   public: {
     Tables: {
