@@ -17,6 +17,7 @@ import authRoutes from "./routes/auth.routes";
 import usersRoutes from "./routes/users.routes";
 import tradingRoutes from "./routes/trading.routes";
 import tradeRoutes from "./routes/trade.routes";
+import transferRoutes from "./routes/transfer.routes";
 // Import middlewares
 import { errorHandler, notFoundHandler } from "./middlewares/error.middleware";
 
@@ -35,6 +36,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", usersRoutes);
 app.use("/api/v1/trading", tradingRoutes);
 app.use("/api/v1/trade", tradeRoutes);
+app.use("/api/v1/transfer", transferRoutes);
 
 // Health check route
 app.get("/health", (req, res) => {
