@@ -30,7 +30,7 @@ export const saveTransfer = async ({
     .single();
 
   if (error) {
-    console.error("trade insert error:", error);
+    console.error("transfer insert error:", error);
     throw error;
   }
 

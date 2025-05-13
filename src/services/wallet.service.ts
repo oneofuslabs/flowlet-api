@@ -6,3 +6,32 @@ export const getPrivateKeyHash = async (publicKey: string) =>
     .select("*")
     .eq("walletPublicKey", publicKey)
     .single();
+
+export const savePrivateKeyHash = async ({
+  userId,
+  publicKey,
+  privateKeyHash,
+}: {
+  userId: string;
+  publicKey: string;
+  privateKeyHash: string;
+}) => {
+  const { data, error } = await getSupabase()
+    .from("wallet")
+    .insert([
+      {
+        profilesId: userId,
+        walletPublicKey: publicKey,
+        walletPrivateKeyHash: privateKeyHash,
+      },
+    ])
+    .single();
+
+  if (error) {
+    console.error("wallet insert error:", error);
+    throw error;
+  }
+
+  return data;
+};
+        
