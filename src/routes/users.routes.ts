@@ -50,37 +50,44 @@ router.get("/config", async (
   }
 
   const userId = req.user.id;
-  const { data: walletData } = await getWalletByUserId(userId);
+  const { data: walletData, error } = await getWalletByUserId(userId);
 
-  console.log(walletData)
+  let walletInfo, transactions = {}
+  if( !error ){
 
-  // balance
-  const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-  const ata = await getAssociatedTokenAddress(new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"), new PublicKey("DG34bJWRt5CM2dVdi6b9mXzmMZRmBPhEm3UcUNEhNnab"));
-  const accountInfo = await getAccount(connection, ata);
-  const balanceUSDC = Number(accountInfo.amount) / 10 ** 6;
-  const solLamports = await connection.getBalance(new PublicKey(walletData.walletPublicKey));
-  const balanceSOL = solLamports / LAMPORTS_PER_SOL;
+    try {
+      // balance
+      const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+      const ata = await getAssociatedTokenAddress(new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"), new PublicKey("DG34bJWRt5CM2dVdi6b9mXzmMZRmBPhEm3UcUNEhNnab"));
+      const accountInfo = await getAccount(connection, ata);
+      const balanceUSDC = Number(accountInfo.amount) / 10 ** 6;
+      const solLamports = await connection.getBalance(new PublicKey(walletData.walletPublicKey));
+      const balanceSOL = solLamports / LAMPORTS_PER_SOL;
 
-  // private key silcez belki ileride
-  const walletInfo = {
-    address: walletData.walletPublicKey,
-    privateKey:
-      "0x9b5e19fc2dd8f486b213768e245c70571e9bcb5b6c1ab38ea2f439d210b7262a",
-    balance: [
-      {
-        currency: "SOL",
-        amount: balanceSOL,
-      },
-      {
-        currency: "USDC",
-        amount: balanceUSDC * 100,
-      },
-    ],
-  };
+      // private key silcez belki ileride
+      walletInfo = {
+        address: walletData.walletPublicKey,
+        privateKey:
+          "0x9b5e19fc2dd8f486b213768e245c70571e9bcb5b6c1ab38ea2f439d210b7262a",
+        balance: [
+          {
+            currency: "SOL",
+            amount: balanceSOL,
+          },
+          {
+            currency: "USDC",
+            amount: balanceUSDC * 100,
+          },
+        ],
+      };
 
-  // transactions
-  const transactions = await getAllTransactions(walletData.walletPublicKey);
+      // transactions
+      transactions = await getAllTransactions(walletData.walletPublicKey);
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
 
   // rates
   const coins = {
