@@ -4,7 +4,7 @@ export const getLastTrade = async () =>
   await getSupabase()
     .from("trade")
     .select("*")
-    .order("id", { ascending: false })
+    .order("create_at", { ascending: false })
     .limit(1)
     .single();
 
