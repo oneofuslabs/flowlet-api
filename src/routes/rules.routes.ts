@@ -52,7 +52,7 @@ router.get("/", async (
         "transaction": {
           "created_at": "2025-05-14T10:52:45.331791+00:00",
           "txHash": "2vH4cqCrsLVYuEvhxoeoxUbBZ5DzRAPbgf6rAJ3BqpiPkbkTBXtQrksURrFHEZPbDfC5nmJBDuHHQCJ1mi9NS13U",
-          "txHashLink": "https://explorer.solana.com/tx/https://explorer.solana.com/tx/2vH4cqCrsLVYuEvhxoeoxUbBZ5DzRAPbgf6rAJ3BqpiPkbkTBXtQrksURrFHEZPbDfC5nmJBDuHHQCJ1mi9NS13U?cluster=devnet?cluster=devnet"
+          "txHashLink": "https://explorer.solana.com/tx/2vH4cqCrsLVYuEvhxoeoxUbBZ5DzRAPbgf6rAJ3BqpiPkbkTBXtQrksURrFHEZPbDfC5nmJBDuHHQCJ1mi9NS13U?cluster=devnet?cluster=devnet"
         },
       },
       {
@@ -69,7 +69,7 @@ router.get("/", async (
         "transaction": {
           "created_at": "2025-05-13T10:52:45.331791+00:00",
           "txHash": "4PyTRjgJfwjJTcMU57TXTvLLTM5K9cc2JFatdybZCj8Uq2J5FHheKvK2AYAg4SChtX2ZsK5JL1ZmLGp4ZxnHmf8",
-          "txHashLink": "https://explorer.solana.com/tx/https://explorer.solana.com/tx/2vH4cqCrsLVYuEvhxoeoxUbBZ5DzRAPbgf6rAJ3BqpiPkbkTBXtQrksURrFHEZPbDfC5nmJBDuHHQCJ1mi9NS13U?cluster=devnet?cluster=devnet"
+          "txHashLink": "https://explorer.solana.com/tx/2vH4cqCrsLVYuEvhxoeoxUbBZ5DzRAPbgf6rAJ3BqpiPkbkTBXtQrksURrFHEZPbDfC5nmJBDuHHQCJ1mi9NS13U?cluster=devnet?cluster=devnet"
         },
       },
     ],
