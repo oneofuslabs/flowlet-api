@@ -3,19 +3,23 @@ import { getRates } from "../services/rates.service";
 
 const router = Router();
 
-// POST /api/v1/rates - Coin prices and rates
-router.post("/", async (
+// GET /api/v1/rates - Coin prices and rates
+router.get("/", async (
   req,
   res: Response,
 ) => {
 
-  const coinIds: string[] = req.body.coinIds;
-
-  if (!coinIds || !Array.isArray(coinIds) || coinIds.length === 0) {
-    return res.status(400).json({ error: "coinIds array is required in request body." });
+  const coins = {
+    "solana": {
+      "tokenName": "SOL",
+      "tokenAddress": "So11111111111111111111111111111111111111112",
+    },
+    "usd-coin": {
+      "tokenName": "USDC",
+      "tokenAddress": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+    },
   }
-
-  const data = await getRates(coinIds);
+  const data = await getRates(coins);
 
   return res.status(200).json({
     rates: data,
