@@ -21,6 +21,7 @@ import transferRoutes from "./routes/transfer.routes";
 import walletRoutes from "./routes/wallet.routes";
 import transactionRoutes from "./routes/transaction.routes";
 import ratesRoutes from "./routes/rates.routes";
+import rulesRoutes from "./routes/rules.routes";
 // Import middlewares
 import { errorHandler, notFoundHandler } from "./middlewares/error.middleware";
 
@@ -43,6 +44,7 @@ app.use("/api/v1/transfer", transferRoutes);
 app.use("/api/v1/wallet", walletRoutes);
 app.use("/api/v1/transaction", transactionRoutes);
 app.use("/api/v1/rates", ratesRoutes);
+app.use("/api/v1/rules", rulesRoutes);
 
 // Health check route
 app.get("/health", (req, res) => {
