@@ -19,6 +19,7 @@ import tradingRoutes from "./routes/trading.routes";
 import tradeRoutes from "./routes/trade.routes";
 import transferRoutes from "./routes/transfer.routes";
 import walletRoutes from "./routes/wallet.routes";
+import transactionRoutes from "./routes/transaction.routes";
 // Import middlewares
 import { errorHandler, notFoundHandler } from "./middlewares/error.middleware";
 
@@ -39,6 +40,7 @@ app.use("/api/v1/trading", tradingRoutes);
 app.use("/api/v1/trade", tradeRoutes);
 app.use("/api/v1/transfer", transferRoutes);
 app.use("/api/v1/wallet", walletRoutes);
+app.use("/api/v1/transaction", transactionRoutes);
 
 // Health check route
 app.get("/health", (req, res) => {

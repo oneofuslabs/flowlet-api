@@ -32,6 +32,19 @@ export interface Transfer {
   create_at: Date;
 }
 
+export interface Stake {
+  id: string;
+  tokenName: string | null;
+  tokenAddress: string | null;
+  amount: number | null;
+  duration: number | null;
+  programId: string | null;
+  status: string | null;
+  walletAddress: string | null;
+  txHash: string | null;
+  create_at: Date;
+}
+
 export interface Database {
   public: {
     Tables: {
