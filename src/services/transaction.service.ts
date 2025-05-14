@@ -22,12 +22,32 @@ export const getAllTransactions = async (publicKey: string) => {
     .order("created_at", { ascending: false })
   console.log({stakeData});
 
-  // type
-  const typedTradeData = (tradeData ?? []).map(item => ({ ...item, type: "trade" }));
-  const typedTransferData = (transferData ?? []).map(item => ({ ...item, type: "transfer" }));
-  const typedStakeData = (stakeData ?? []).map(item => ({ ...item, type: "stake" }));
+  const buildTxLink = (txHash: string) =>
+    `https://explorer.solana.com/tx/${txHash}?cluster=devnet`;
 
-  const allTransactions = [...typedTradeData, ...typedTransferData, ...typedStakeData];
+  const typedTradeData = (tradeData ?? []).map(item => ({
+    ...item,
+    type: "trade",
+    txHashLink: buildTxLink(item.txHash),
+  }));
+
+  const typedTransferData = (transferData ?? []).map(item => ({
+    ...item,
+    type: "transfer",
+    txHashLink: buildTxLink(item.txHash),
+  }));
+
+  const typedStakeData = (stakeData ?? []).map(item => ({
+    ...item,
+    type: "stake",
+    txHashLink: buildTxLink(item.txHash),
+  }));
+
+  const allTransactions = [
+    ...typedTradeData,
+    ...typedTransferData,
+    ...typedStakeData,
+  ];
 
   // created_at desc
   allTransactions.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());

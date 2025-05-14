@@ -161,17 +161,18 @@ router.post("/swap", async (
   console.log('txIds:', txIds);
   txIds.forEach((txId) => console.log(`https://explorer.solana.com/tx/${txId}?cluster=devnet`));
 
+  const txHash = txIds[0];
   const transactionHashLink = `https://explorer.solana.com/tx/${txIds[0]}?cluster=devnet`;
 
   await saveTrade({
     fromCurrency: "SOL",
     toCurrency: "USDC",
     amount: 0.1,
-    txHash: transactionHashLink
+    txHash: txHash
   });
 
   return res.status(200).json({
-    link: transactionHashLink,
+    txHashlink: transactionHashLink,
   });
 
 });
