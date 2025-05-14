@@ -34,4 +34,10 @@ export const savePrivateKeyHash = async ({
 
   return data;
 };
-        
+
+export const getWalletByUserId = async (userId: string) =>
+  await getSupabase()
+    .from("wallet")
+    .select("*")
+    .eq("profilesId", userId)
+    .single();
