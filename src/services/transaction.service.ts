@@ -52,7 +52,5 @@ export const getAllTransactions = async (publicKey: string) => {
   // created_at desc
   allTransactions.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-  console.log(allTransactions)
-
   return allTransactions;
 }

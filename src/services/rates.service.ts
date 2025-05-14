@@ -1,61 +1,52 @@
 import fetch from "node-fetch";
 
-type RateResponseItem = {
-  usd: number;
-  rate: number;
-  symbol: string;
-};
-
-type PriceMap = {
-  [key: string]: RateResponseItem;
-};
-
-type PriceResponse = {
-  [key: string]: {
-    usd: number;
-    rate?: number;
+type CoinInput = {
+  [id: string]: {
+    tokenName: string;
+    tokenAddress: string;
   };
 };
 
-type CoinInfo = {
-  symbol: string;
+type CoinOutput = {
+  [id: string]: {
+    tokenName: string;
+    tokenAddress: string;
+    usd: number;
+    rate: number;
+  };
 };
 
 export const getRates = async (
-  coinIds: string[],
-  baseSymbol: string = "usd-coin"
-): Promise<PriceMap> => {
-  const finalIds = Array.from(new Set([...coinIds, baseSymbol]));
-  const idsParam = finalIds.join(",");
+  coins: CoinInput,
+): Promise<CoinOutput> => {
+  const coinIds = Object.keys(coins);
+  const idsParam = [...coinIds, "usd-coin"].join(",");
   const url = `https://api.coingecko.com/api/v3/simple/price?ids=${idsParam}&vs_currencies=usd`;
 
   try {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`CoinGecko price API error: ${res.status}`);
+    if (!res.ok) throw new Error(`CoinGecko API error: ${res.status}`);
 
-    const priceData = await res.json() as PriceResponse;
-    const baseUsd = priceData[baseSymbol]?.usd;
-    if (!baseUsd) throw new Error(`Base coin '${baseSymbol}' price not found.`);
+    const priceData = (await res.json()) as { [id: string]: { usd: number } };
 
-    const results: PriceMap = {};
+    const baseUsd = priceData["usd-coin"]?.usd;
+    if (!baseUsd) throw new Error(`USDC ('usd-coin') price not found.`);
 
-    for (const id of finalIds) {
+    const output: CoinOutput = {};
+
+    for (const id of coinIds) {
+      const coinInfo = coins[id];
       const usd = priceData[id]?.usd;
       if (!usd) continue;
 
-      // Her coin için symbol'ü ayrı çağır
-      const coinRes = await fetch(`https://api.coingecko.com/api/v3/coins/${id}`);
-      const coinJson = (await coinRes.json()) as CoinInfo;
-      const symbol = coinJson?.symbol?.toUpperCase() || "UNKNOWN";
-
-      results[id] = {
+      output[id] = {
+        ...coinInfo,
         usd,
         rate: parseFloat((baseUsd / usd).toFixed(6)),
-        symbol,
       };
     }
 
-    return results;
+    return output;
 
   } catch (err) {
     console.log(err);
