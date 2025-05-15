@@ -55,9 +55,10 @@ router.get("/config", async (
 
   const userId = req.user.id;
   const { data: walletData, error } = await getWalletByUserId(userId);
+  const wallet = walletData && walletData[0];
 
   let walletInfo, transactions = {};
-  if (!error) {
+  if (!error && wallet) {
     try {
       // balance
       const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
@@ -68,13 +69,13 @@ router.get("/config", async (
       const accountInfo = await getAccount(connection, ata);
       const balanceUSDC = Number(accountInfo.amount) / 10 ** 6;
       const solLamports = await connection.getBalance(
-        new PublicKey(walletData.walletPublicKey),
+        new PublicKey(wallet.walletPublicKey),
       );
       const balanceSOL = solLamports / LAMPORTS_PER_SOL;
 
       // private key silcez belki ileride
       walletInfo = {
-        address: walletData.walletPublicKey,
+        address: wallet.walletPublicKey,
         privateKey:
           "0x9b5e19fc2dd8f486b213768e245c70571e9bcb5b6c1ab38ea2f439d210b7262a",
         balance: [
@@ -90,7 +91,7 @@ router.get("/config", async (
       };
 
       // transactions
-      transactions = await getAllTransactions(walletData.walletPublicKey);
+      transactions = await getAllTransactions(wallet.walletPublicKey);
     } catch (error) {
       console.log(error);
     }

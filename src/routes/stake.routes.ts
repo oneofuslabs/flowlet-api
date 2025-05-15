@@ -1,18 +1,18 @@
 import { Response, Router } from "express";
 import { decrypt } from "../utils/wallet";
 import { getWalletByUserId } from "../services/wallet.service";
-import { saveStake, getStakeByUserAndStakeId } from "../services/stake.service";
+import { getStakeByUserAndStakeId, saveStake } from "../services/stake.service";
 
 import {
-  Connection,
+  Authorized,
   clusterApiUrl,
+  Connection,
   Keypair,
-  PublicKey,
   LAMPORTS_PER_SOL,
+  Lockup,
+  PublicKey,
   sendAndConfirmTransaction,
   StakeProgram,
-  Authorized,
-  Lockup,
 } from "@solana/web3.js";
 import bs58 from "bs58";
 
@@ -23,15 +23,22 @@ router.post("/deposit", async (
   req,
   res: Response,
 ) => {
-
   const userId = req.body.userId;
   const amount = req.body.amount;
-  const wallet = await getWalletByUserId(userId);
+  const { data: walletData, error: walletError } = await getWalletByUserId(
+    userId,
+  );
+  const wallet = walletData && walletData[0];
+
+  if (walletError || !wallet) {
+    return res.status(400).json({ message: "Wallet not found" });
+  }
+
   const publicKey = new PublicKey(wallet.walletPublicKey);
-  const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'base64');
+  const key = Buffer.from(process.env.ENCRYPTION_KEY!, "base64");
   const privateKey = decrypt(wallet.walletPrivateKeyHash, key);
   const userKeypair = Keypair.fromSecretKey(bs58.decode(privateKey));
-  
+
   const amountToStake = Math.floor(amount * 1e9);
 
   // yeni olusturulan stake hesabi
@@ -63,7 +70,7 @@ router.post("/deposit", async (
     [
       userKeypair,
       stakeAccount, // Since we're creating a new stake account, we have that account sign as well
-    ]
+    ],
   );
   console.log(`Stake account created. Tx Id: ${createStakeAccountTxId}`);
 
@@ -78,7 +85,9 @@ router.post("/deposit", async (
 
   // bu islem de ayni datayi almamizi sagliyor
   // su anki status init
-  const parsedInit = await connection.getParsedAccountInfo(stakeAccount.publicKey);
+  const parsedInit = await connection.getParsedAccountInfo(
+    stakeAccount.publicKey,
+  );
   console.dir(parsedInit.value?.data, { depth: null });
 
   // hersey ok ise burada initialized olarak db e kaydedelim
@@ -100,19 +109,26 @@ router.post("/deposit", async (
     authorizedPubkey: publicKey,
     votePubkey: validatorVotePubkey,
   });
-  const delegateTxId = await sendAndConfirmTransaction(connection, delegateTx, [userKeypair]);
-  console.log(`Stake account delegated to ${validatorVotePubkey}. Tx Id: ${delegateTxId}`);
+  const delegateTxId = await sendAndConfirmTransaction(connection, delegateTx, [
+    userKeypair,
+  ]);
+  console.log(
+    `Stake account delegated to ${validatorVotePubkey}. Tx Id: ${delegateTxId}`,
+  );
 
   // delegated olmasi lazim
-  const parsedDelegate = await connection.getParsedAccountInfo(stakeAccount.publicKey);
+  const parsedDelegate = await connection.getParsedAccountInfo(
+    stakeAccount.publicKey,
+  );
   console.dir(parsedDelegate.value?.data, { depth: null });
-
 
   // rent disinda kalan gercek stake amounti
   const parsedData = parsedDelegate.value?.data;
-  if( parsedData && "parsed" in parsedData ){
+  if (parsedData && "parsed" in parsedData) {
     const parsed = parsedData.parsed;
-    const delegatedLamports = Number(parsed?.info?.stake?.delegation?.stake || 0);
+    const delegatedLamports = Number(
+      parsed?.info?.stake?.delegation?.stake || 0,
+    );
     const delegatedSOL = delegatedLamports / LAMPORTS_PER_SOL;
 
     await saveStake({
@@ -126,13 +142,11 @@ router.post("/deposit", async (
       status: "delegated",
       txHash: delegateTxId,
     });
-
   }
 
   return res.status(200).json({
     userId: userId,
   });
-
 });
 
 // POST /api/v1/stake/withdraw - Stake Deactivate and Withdraw
@@ -140,17 +154,23 @@ router.post("/withdraw", async (
   req,
   res: Response,
 ) => {
-
   const userId = req.body.userId;
   const stakeId = req.body.stakeId;
 
   const stakeData = await getStakeByUserAndStakeId(userId, stakeId);
-  const wallet = await getWalletByUserId(userId);
+  const { data: walletData, error: walletError } = await getWalletByUserId(
+    userId,
+  );
+  const wallet = walletData && walletData[0];
+
+  if (walletError || !wallet) {
+    return res.status(400).json({ message: "Wallet not found" });
+  }
 
   // kontrol
-  if( stakeData.walletAddress === wallet.walletPublicKey ){
+  if (stakeData.walletAddress === wallet.walletPublicKey) {
     const publicKey = new PublicKey(wallet.walletPublicKey);
-    const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'base64');
+    const key = Buffer.from(process.env.ENCRYPTION_KEY!, "base64");
     const privateKey = decrypt(wallet.walletPrivateKeyHash, key);
     const userKeypair = Keypair.fromSecretKey(bs58.decode(privateKey));
 
@@ -162,7 +182,11 @@ router.post("/withdraw", async (
       stakePubkey: new PublicKey(stakeAccount),
       authorizedPubkey: publicKey,
     });
-    const deactivateTxId = await sendAndConfirmTransaction(connection, deactivateTx, [userKeypair]);
+    const deactivateTxId = await sendAndConfirmTransaction(
+      connection,
+      deactivateTx,
+      [userKeypair],
+    );
     console.log("Stake deactivated. Tx:", deactivateTxId);
 
     // balance kontrol
@@ -189,8 +213,12 @@ router.post("/withdraw", async (
       toPubkey: publicKey,
       lamports: balance,
     });
-  
-    const withdrawTxId = await sendAndConfirmTransaction(connection, withdrawTx, [userKeypair]);
+
+    const withdrawTxId = await sendAndConfirmTransaction(
+      connection,
+      withdrawTx,
+      [userKeypair],
+    );
     console.log("Stake withdrawn. Tx:", withdrawTxId);
 
     await saveStake({
@@ -208,13 +236,11 @@ router.post("/withdraw", async (
     return res.status(200).json({
       userId: userId,
     });
-
   } else {
     return res
-        .status(400)
-        .json({ message: "not match", });
+      .status(400)
+      .json({ message: "not match" });
   }
-
 });
 
 export default router;
