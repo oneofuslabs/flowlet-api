@@ -1,5 +1,7 @@
 import { Response, Router } from "express";
 import { saveTrade, getLastTrade } from "../services/trade.service";
+import { decrypt } from "../utils/wallet";
+import { getWalletByUserId } from "../services/wallet.service";
 
 import {
   toFeeConfig,
@@ -10,10 +12,11 @@ import {
   setLoggerLevel,
   LogLevel,
 } from '@raydium-io/raydium-sdk-v2'
-import { PublicKey, Connection } from '@solana/web3.js'
-import { getAccount, getAssociatedTokenAddress, NATIVE_MINT, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
+import { PublicKey, Connection, Keypair } from '@solana/web3.js'
+import { getAccount, getAssociatedTokenAddress, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
 import { initSdk, txVersion } from "../config/raydium";
 import { readCachePoolData, writeCachePoolData } from '../utils/raydiumPoolCache';
+import bs58 from 'bs58';
 
 setLoggerLevel('Raydium_tradeV2', LogLevel.Debug)
 
@@ -25,30 +28,48 @@ router.post("/swap", async (
   res: Response,
 ) => {
 
-  const raydium = await initSdk();
-  await raydium.fetchChainTime();
+  const userId = req.body.userId;
+  const amount = req.body.amount;
+  const fromCurrencyName = req.body.fromCurrencyName;
+  const toCurrencyName = req.body.toCurrencyName;
+  const fromCurrencyAddress = req.body.fromCurrencyAddress;
+  const toCurrencyAddress = req.body.toCurrencyAddress;
 
-  const a = Number(req.body.fromAmount);
-  let inputAmount = "";
-  if( a === 0.01 ){
-    inputAmount = "10000000"; // 0.01 SOL
-  }else{
-    inputAmount = "20000000"; // 0.02 SOL
+  const { data: walletData, error: walletError } = await getWalletByUserId(
+    userId,
+  );
+  const wallet = walletData && walletData[0];
+
+  if (walletError || !wallet) {
+    return res.status(400).json({ message: "Wallet not found" });
   }
 
-  const SOL = NATIVE_MINT; // or WSOLMint
-  const [inputMint, outputMint] = [SOL, new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU")];
-  const [inputMintStr, outputMintStr] = [inputMint.toBase58(), outputMint.toBase58()];
+  const key = Buffer.from(process.env.ENCRYPTION_KEY!, "base64");
+  const privateKey = decrypt(wallet.walletPrivateKeyHash, key);
+  const userKeypair = Keypair.fromSecretKey(bs58.decode(privateKey));
 
-  // ileride cached pool data kullanilabilir
+  const owner: Keypair = userKeypair;
+  const raydium = await initSdk(owner);
+  await raydium.fetchChainTime();
+
+  //const USDC_DEV_MINT = new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU")
+  //const USDC_DEV_MINT = new PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr");
+
+  const inputMint = new PublicKey(fromCurrencyAddress);
+  const outputMint = new PublicKey(toCurrencyAddress);
+
+  //const SOL = NATIVE_MINT; // or WSOLMint
+  //const [inputMint, outputMint] = [SOL, USDC_DEV_MINT];
+  //const [inputMint, outputMint] = [USDC_DEV_MINT, SOL];
+  const [inputMintStr, outputMintStr] = [inputMint.toBase58(), outputMint.toBase58()];
   console.log('fetching all pool basic info, this might take a while (more than 1 minutes)..');
-  let poolData = readCachePoolData(1000 * 60 * 60 * 24 * 10); // example for cache 1 day
+  let poolData = readCachePoolData(1000 * 60 * 60 * 24 * 10);
   if (poolData.ammPools.length === 0) {
     console.log(
       '**Please ensure you are using "paid" rpc node or you might encounter fetch data error due to pretty large pool data**'
     );
     console.log('fetching all pool basic info, this might take a while (more than 1 minutes)..');
-    //poolData = await raydium.tradeV2.fetchRoutePoolBasicInfo()
+    
     // devent pool info
     poolData = await raydium.tradeV2.fetchRoutePoolBasicInfo({
       amm: DEVNET_PROGRAM_ID.AmmV4,
@@ -59,16 +80,13 @@ router.post("/swap", async (
   }
 
   console.log('computing swap route..');
-  // route here also can cache for a time period by pair to reduce time
-  // e.g.{inputMint}-${outputMint}'s routes, if poolData don't change, routes should be almost same
+  
   const raydiumRoutes = raydium.tradeV2.getAllRoute({
     inputMint,
     outputMint,
     ...poolData,
   });
 
-  // data here also can try to cache if you wants e.g. mintInfos
-  // but rpc related info doesn't suggest to cache it for a long time, because base/quote reserve and pool price change by time
   const {
     routePathDict,
     mintInfos,
@@ -84,6 +102,10 @@ router.post("/swap", async (
     outputMint,
   });
 
+  const fromDecimals = mintInfos[inputMintStr]?.decimals ?? 9; // SOL = 9, USDC = 6
+  const inputAmountLamports = (parseFloat(amount) * Math.pow(10, fromDecimals)).toString();
+  console.log({inputAmountLamports});
+
   console.log('calculating available swap routes...');
   const swapRoutes = raydium.tradeV2.getAllRouteComputeAmountOut({
     inputTokenAmount: new TokenAmount(
@@ -92,7 +114,7 @@ router.post("/swap", async (
         decimals: mintInfos[inputMintStr].decimals,
         isToken2022: mintInfos[inputMintStr].programId.equals(TOKEN_2022_PROGRAM_ID),
       }),
-      inputAmount
+      inputAmountLamports
     ),
     directPath: raydiumRoutes.directPath.map(
       (p) =>
@@ -138,7 +160,6 @@ router.post("/swap", async (
 
   console.log('build swap tx..');
   const { execute } = await raydium.tradeV2.swap({
-    //routeProgram: Router,
     routeProgram: new PublicKey("BVChZ3XFEwTMUk1o9i3HAf91H6mFxSwa5X2wFAWhYPhU"),
     txVersion,
     swapInfo: targetRoute,
@@ -162,10 +183,12 @@ router.post("/swap", async (
     const transactionHashLink = `https://explorer.solana.com/tx/${txIds[0]}?cluster=devnet`;
 
     await saveTrade({
-      fromCurrency: "SOL",
-      toCurrency: "USDC",
-      amount: 0.01,
-      txHash: txHash
+      fromCurrency: fromCurrencyName,
+      toCurrency: toCurrencyName,
+      amount: amount,
+      txHash: txHash,
+      walletAddress: wallet.walletPublicKey,
+      profilesId: userId,
     });
 
     return res.status(200).json({

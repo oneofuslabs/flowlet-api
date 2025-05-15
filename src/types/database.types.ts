@@ -21,6 +21,8 @@ export interface Trade {
   amount: number | null;
   txHash: string | null;
   create_at: Date;
+  walletAddress: string | null;
+  profilesId: string;
 }
 
 export interface Transfer {
