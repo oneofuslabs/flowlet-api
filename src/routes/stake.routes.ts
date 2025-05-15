@@ -5,7 +5,6 @@ import { getStakeByUserAndStakeId, saveStake, getStakeList } from "../services/s
 
 import {
   Authorized,
-  clusterApiUrl,
   Connection,
   Keypair,
   LAMPORTS_PER_SOL,
@@ -50,7 +49,8 @@ router.post("/deposit", async (
   // yeni olusturulan stake hesabi
   const stakeAccount = Keypair.generate();
 
-  const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+  //const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+  const connection = new Connection(process.env.HELIUS_HTTP_KEY!, "confirmed");
 
   // tum validatorlari al
   //const { current, delinquent } = await connection.getVoteAccounts();
@@ -180,7 +180,8 @@ router.post("/withdraw", async (
     const privateKey = decrypt(wallet.walletPrivateKeyHash, key);
     const userKeypair = Keypair.fromSecretKey(bs58.decode(privateKey));
 
-    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    //const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    const connection = new Connection(process.env.HELIUS_HTTP_KEY!, "confirmed");
     const stakeAccount = stakeData.stakeAccount;
 
     // deactivate et

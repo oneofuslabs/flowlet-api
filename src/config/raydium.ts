@@ -4,8 +4,7 @@ import { TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
 import bs58 from 'bs58'
 
 export const owner: Keypair = Keypair.fromSecretKey(bs58.decode('uqFpjudJe1QPPsqcciHWFsj6v3hmX2485XXupuwRdVx556LYvpZHWtKZCaXfMk6yo97D41zoGzuBP3wrVvcp8Zu'))
-export const connection = new Connection('https://api.devnet.solana.com') //<YOUR_RPC_URL>
-// export const connection = new Connection(clusterApiUrl('devnet')) //<YOUR_RPC_URL>
+export const connection = new Connection(process.env.HELIUS_HTTP_KEY!, "confirmed");
 export const txVersion = TxVersion.V0 // or TxVersion.LEGACY
 //const cluster = 'mainnet' // 'mainnet' | 'devnet'
 const cluster = 'devnet' // 'mainnet' | 'devnet'

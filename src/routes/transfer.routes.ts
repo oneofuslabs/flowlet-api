@@ -44,8 +44,9 @@ router.post("/token", async (
   const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'base64');
   const privateKey = decrypt(walletPrivateKeyHash, key);
 
-  const RPC_URL = "https://api.devnet.solana.com";
-  const connection = new Connection(RPC_URL, "confirmed");
+  //const RPC_URL = "https://api.devnet.solana.com";
+  //const connection = new Connection(RPC_URL, "confirmed");
+  const connection = new Connection(process.env.HELIUS_HTTP_KEY!, "confirmed");
 
   // calculate decimals for token
   const mintInfo = await getMint(connection, new PublicKey(tokenAddress));

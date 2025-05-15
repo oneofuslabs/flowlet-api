@@ -6,7 +6,6 @@ import {
 import { Profile } from "../types/database.types";
 import { getUserProfile, updateUserProfile } from "../services/user.service";
 import {
-  clusterApiUrl,
   Connection,
   LAMPORTS_PER_SOL,
   PublicKey,
@@ -61,7 +60,8 @@ router.get("/config", async (
   if (!error && wallet) {
     try {
       // balance
-      const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+      //const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+      const connection = new Connection(process.env.HELIUS_HTTP_KEY!, "confirmed");
       const ata = await getAssociatedTokenAddress(
         new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
         new PublicKey("DG34bJWRt5CM2dVdi6b9mXzmMZRmBPhEm3UcUNEhNnab"),
