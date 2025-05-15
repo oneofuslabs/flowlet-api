@@ -1,7 +1,7 @@
 import { Response, Router } from "express";
 import { decrypt } from "../utils/wallet";
 import { getWalletByUserId } from "../services/wallet.service";
-import { getStakeByUserAndStakeId, saveStake } from "../services/stake.service";
+import { getStakeByUserAndStakeId, saveStake, getStakeList } from "../services/stake.service";
 
 import {
   Authorized,
@@ -15,6 +15,12 @@ import {
   StakeProgram,
 } from "@solana/web3.js";
 import bs58 from "bs58";
+
+interface StakeRecord {
+  stakeAccount: string;
+  created_at: string;
+  [key: string]: string | number | null | undefined;
+}
 
 const router = Router();
 
@@ -241,6 +247,42 @@ router.post("/withdraw", async (
       .status(400)
       .json({ message: "not match" });
   }
+});
+
+// POST /api/v1/stake - Stake List
+router.post("/", async (
+  req,
+  res: Response,
+) => {
+
+  const userId = req.body.userId;
+  const { data, error } = await getStakeList(userId);
+
+  if( error ){
+    return res
+      .status(400)
+      .json({ message: "data not found" });
+  }
+
+  const groupedMap = new Map<string, StakeRecord>();
+  for (const item of data as StakeRecord[]) {
+    const stakeKey = item.stakeAccount;
+    const existing = groupedMap.get(stakeKey);
+  
+    if (!existing || new Date(item.created_at) > new Date(existing.created_at)) {
+      groupedMap.set(stakeKey, item);
+    }
+  }
+
+  const latest = Array.from(groupedMap.values());
+
+  console.log(latest);
+
+  return res.status(200).json({
+    userId: userId,
+    stakes: latest,
+  });
+
 });
 
 export default router;
