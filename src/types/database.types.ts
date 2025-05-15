@@ -34,11 +34,12 @@ export interface Transfer {
 
 export interface Stake {
   id: string;
+  userId: string;
   tokenName: string | null;
   tokenAddress: string | null;
+  stakeAccount: string | null;
+  validator: string | null;
   amount: number | null;
-  duration: number | null;
-  programId: string | null;
   status: string | null;
   walletAddress: string | null;
   txHash: string | null;
