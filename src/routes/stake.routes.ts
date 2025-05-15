@@ -200,7 +200,7 @@ router.post("/withdraw", async (
       tokenAddress: "So11111111111111111111111111111111111111112",
       stakeAccount: stakeData.stakeAccount,
       validator: stakeData.validator,
-      amount: stakeData.amount,
+      amount: balance / LAMPORTS_PER_SOL,
       status: "withdrawn",
       txHash: withdrawTxId,
     });
