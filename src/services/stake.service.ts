@@ -61,3 +61,10 @@ export const getStakeByUserAndStakeId = async (userId: string, stakeId: string) 
 
   return data;
 };
+
+export const getStakeList = async (userId: string) =>
+  await getSupabase()
+    .from("stakechain")
+    .select("*")
+    .eq("profilesId", userId)
+    .order("created_at", { ascending: false })
