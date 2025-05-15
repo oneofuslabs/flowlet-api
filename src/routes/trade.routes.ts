@@ -30,14 +30,12 @@ router.post("/swap", async (
 
   const a = Number(req.body.fromAmount);
   let inputAmount = "";
-  if( a === 0.1 ){
-    inputAmount = "100000000"; // 0.1 SOL
+  if( a === 0.01 ){
+    inputAmount = "10000000"; // 0.01 SOL
   }else{
-    inputAmount = "200000000"; // 0.2 SOL
+    inputAmount = "20000000"; // 0.02 SOL
   }
 
-  //const inputAmount = '8000000';
-  //const inputAmount = "100000000"; // 0.1 SOL
   const SOL = NATIVE_MINT; // or WSOLMint
   const [inputMint, outputMint] = [SOL, new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU")];
   const [inputMintStr, outputMintStr] = [inputMint.toBase58(), outputMint.toBase58()];
@@ -156,24 +154,28 @@ router.post("/swap", async (
   });
 
   console.log('execute tx..');
-  // sequentially should always to be true because first tx does initialize token accounts needed for swap
-  const { txIds } = await execute({ sequentially: true });
-  console.log('txIds:', txIds);
-  txIds.forEach((txId) => console.log(`https://explorer.solana.com/tx/${txId}?cluster=devnet`));
+  try {
+    const { txIds } = await execute({ sequentially: true });
+    console.log('txIds:', txIds);
 
-  const txHash = txIds[0];
-  const transactionHashLink = `https://explorer.solana.com/tx/${txIds[0]}?cluster=devnet`;
+    const txHash = txIds[0];
+    const transactionHashLink = `https://explorer.solana.com/tx/${txIds[0]}?cluster=devnet`;
 
-  await saveTrade({
-    fromCurrency: "SOL",
-    toCurrency: "USDC",
-    amount: 0.1,
-    txHash: txHash
-  });
+    await saveTrade({
+      fromCurrency: "SOL",
+      toCurrency: "USDC",
+      amount: 0.01,
+      txHash: txHash
+    });
 
-  return res.status(200).json({
-    txHashlink: transactionHashLink,
-  });
+    return res.status(200).json({
+      txHashlink: transactionHashLink,
+    });
+
+  } catch (err) {
+    console.error("Swap tx execute error:", err);
+    return res.status(500).json({ error: "Swap execute failed", details: err });
+  }
 
 });
 
