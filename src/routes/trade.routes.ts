@@ -10,7 +10,7 @@ import {
   setLoggerLevel,
   LogLevel,
 } from '@raydium-io/raydium-sdk-v2'
-import { PublicKey, Connection, clusterApiUrl } from '@solana/web3.js'
+import { PublicKey, Connection } from '@solana/web3.js'
 import { getAccount, getAssociatedTokenAddress, NATIVE_MINT, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
 import { initSdk, txVersion } from "../config/raydium";
 import { readCachePoolData, writeCachePoolData } from '../utils/raydiumPoolCache';
@@ -190,7 +190,8 @@ router.get("/swap", async (
 
   let balance = 0;
   try {
-    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    //const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    const connection = new Connection(process.env.HELIUS_HTTP_KEY!, "confirmed");
     const ata = await getAssociatedTokenAddress(new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"), new PublicKey("DG34bJWRt5CM2dVdi6b9mXzmMZRmBPhEm3UcUNEhNnab"));
     const accountInfo = await getAccount(connection, ata);
     balance = Number(accountInfo.amount) / 10 ** 6;

@@ -24,8 +24,9 @@ router.post("/", async (
 ) => {
 
   const userId = req.body.userId;
-  const RPC_URL = "https://api.devnet.solana.com";
-  const connection = new Connection(RPC_URL, "confirmed");
+  //const RPC_URL = "https://api.devnet.solana.com";
+  //const connection = new Connection(RPC_URL, "confirmed");
+  const connection = new Connection(process.env.HELIUS_HTTP_KEY!, "confirmed");
   //const PROGRAM_ID = new PublicKey(process.env.PROGRAM_ID || 'MkzXKbBcCv6GtuJ3KLHRqWKQQyPn2xBYF81FcXUShg9');
 
   // wallet generate et
