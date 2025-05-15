@@ -21,6 +21,15 @@ router.get("/", async (
   }
   const data = await getRates(coins);
 
+  // BONK
+  // 9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E
+
+  // JUP
+  // JUP4Fb2cqiRUcaTHdrPC8h2gNsA2ETXiPDD33WcGuJB
+
+  // PYTH
+  // FsSMi3i1i1i1i1i1i1i1i1i1i1i1i1i1i1i1i1i1i1i1
+
   return res.status(200).json({
     rates: data,
   });

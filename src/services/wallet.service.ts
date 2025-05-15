@@ -35,9 +35,13 @@ export const savePrivateKeyHash = async ({
   return data;
 };
 
-export const getWalletByUserId = async (userId: string) =>
-  await getSupabase()
+export const getWalletByUserId = async (userId: string) => {
+  const { data } = await getSupabase()
     .from("wallet")
     .select("*")
     .eq("profilesId", userId)
-    .single();
+    .order("created_at", { ascending: true }) // varsa en eskisi
+    .limit(1);
+
+  return data?.[0] || null;
+};
