@@ -5,8 +5,13 @@ import {
 } from "../middlewares/auth.middleware";
 import { Profile } from "../types/database.types";
 import { getUserProfile, updateUserProfile } from "../services/user.service";
-import { Connection, PublicKey, clusterApiUrl, LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { getAssociatedTokenAddress, getAccount } from "@solana/spl-token";
+import {
+  clusterApiUrl,
+  Connection,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+} from "@solana/web3.js";
+import { getAccount, getAssociatedTokenAddress } from "@solana/spl-token";
 import { getWalletByUserId } from "../services/wallet.service";
 import { getAllTransactions } from "../services/transaction.service";
 import { getRates } from "../services/rates.service";
@@ -44,7 +49,6 @@ router.get("/config", async (
   req: AuthenticatedRequest,
   res: Response,
 ) => {
-
   if (!req.user?.id) {
     return res.status(401).json({ message: "Not authenticated" });
   }
@@ -52,16 +56,20 @@ router.get("/config", async (
   const userId = req.user.id;
   const { data: walletData, error } = await getWalletByUserId(userId);
 
-  let walletInfo, transactions = {}
-  if( !error ){
-
+  let walletInfo, transactions = {};
+  if (!error) {
     try {
       // balance
       const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-      const ata = await getAssociatedTokenAddress(new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"), new PublicKey("DG34bJWRt5CM2dVdi6b9mXzmMZRmBPhEm3UcUNEhNnab"));
+      const ata = await getAssociatedTokenAddress(
+        new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
+        new PublicKey("DG34bJWRt5CM2dVdi6b9mXzmMZRmBPhEm3UcUNEhNnab"),
+      );
       const accountInfo = await getAccount(connection, ata);
       const balanceUSDC = Number(accountInfo.amount) / 10 ** 6;
-      const solLamports = await connection.getBalance(new PublicKey(walletData.walletPublicKey));
+      const solLamports = await connection.getBalance(
+        new PublicKey(walletData.walletPublicKey),
+      );
       const balanceSOL = solLamports / LAMPORTS_PER_SOL;
 
       // private key silcez belki ileride
@@ -84,9 +92,8 @@ router.get("/config", async (
       // transactions
       transactions = await getAllTransactions(walletData.walletPublicKey);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-
   }
 
   // rates
@@ -99,7 +106,7 @@ router.get("/config", async (
       "tokenName": "USDC",
       "tokenAddress": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
     },
-  }
+  };
   const rates = await getRates(coins);
 
   // mock rules
@@ -146,8 +153,10 @@ router.get("/config", async (
         "completed_at": "2025-05-14T10:52:45.331791+00:00",
         "transaction": {
           "created_at": "2025-05-14T10:52:45.331791+00:00",
-          "txHash": "2vH4cqCrsLVYuEvhxoeoxUbBZ5DzRAPbgf6rAJ3BqpiPkbkTBXtQrksURrFHEZPbDfC5nmJBDuHHQCJ1mi9NS13U",
-          "txHashLink": "https://explorer.solana.com/tx/2vH4cqCrsLVYuEvhxoeoxUbBZ5DzRAPbgf6rAJ3BqpiPkbkTBXtQrksURrFHEZPbDfC5nmJBDuHHQCJ1mi9NS13U?cluster=devnet?cluster=devnet"
+          "txHash":
+            "2vH4cqCrsLVYuEvhxoeoxUbBZ5DzRAPbgf6rAJ3BqpiPkbkTBXtQrksURrFHEZPbDfC5nmJBDuHHQCJ1mi9NS13U",
+          "txHashLink":
+            "https://explorer.solana.com/tx/2vH4cqCrsLVYuEvhxoeoxUbBZ5DzRAPbgf6rAJ3BqpiPkbkTBXtQrksURrFHEZPbDfC5nmJBDuHHQCJ1mi9NS13U?cluster=devnet?cluster=devnet",
         },
       },
       {
@@ -163,12 +172,14 @@ router.get("/config", async (
         "completed_at": "2025-05-13T10:52:45.331791+00:00",
         "transaction": {
           "created_at": "2025-05-13T10:52:45.331791+00:00",
-          "txHash": "4PyTRjgJfwjJTcMU57TXTvLLTM5K9cc2JFatdybZCj8Uq2J5FHheKvK2AYAg4SChtX2ZsK5JL1ZmLGp4ZxnHmf8",
-          "txHashLink": "https://explorer.solana.com/tx/2vH4cqCrsLVYuEvhxoeoxUbBZ5DzRAPbgf6rAJ3BqpiPkbkTBXtQrksURrFHEZPbDfC5nmJBDuHHQCJ1mi9NS13U?cluster=devnet?cluster=devnet"
+          "txHash":
+            "4PyTRjgJfwjJTcMU57TXTvLLTM5K9cc2JFatdybZCj8Uq2J5FHheKvK2AYAg4SChtX2ZsK5JL1ZmLGp4ZxnHmf8",
+          "txHashLink":
+            "https://explorer.solana.com/tx/2vH4cqCrsLVYuEvhxoeoxUbBZ5DzRAPbgf6rAJ3BqpiPkbkTBXtQrksURrFHEZPbDfC5nmJBDuHHQCJ1mi9NS13U?cluster=devnet?cluster=devnet",
         },
       },
     ],
-  }
+  };
 
   return res.status(200).json({
     wallet: walletInfo,
@@ -188,16 +199,18 @@ router.patch("/profile", async (
       return res.status(401).json({ message: "Not authenticated" });
     }
 
-    const { name, avatar_url } = req.body;
+    const { full_name, preferences, avatar_url, onboarded_at } = req.body;
 
     // Validate input
-    if (!name && !avatar_url) {
+    if (!(full_name || preferences || avatar_url || onboarded_at)) {
       return res.status(400).json({ message: "Nothing to update" });
     }
 
     const updateData: Partial<Profile> = {};
-    if (name) updateData.name = name;
+    if (full_name) updateData.full_name = full_name;
+    if (preferences) updateData.preferences = preferences;
     if (avatar_url) updateData.avatar_url = avatar_url;
+    if (onboarded_at) updateData.onboarded_at = onboarded_at;
 
     const { data, error } = await updateUserProfile(req.user.id, updateData);
 
