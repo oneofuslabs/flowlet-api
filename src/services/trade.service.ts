@@ -13,11 +13,15 @@ export const saveTrade = async ({
   toCurrency,
   amount,
   txHash,
+  walletAddress,
+  profilesId,
 }: {
   fromCurrency: string;
   toCurrency: string;
   amount: number;
   txHash: string;
+  walletAddress: string;
+  profilesId: string;
 }) => {
   const { data, error } = await getSupabase()
     .from("trade")
@@ -27,6 +31,8 @@ export const saveTrade = async ({
         toCurrency: toCurrency,
         amount,
         txHash: txHash,
+        walletAddress: walletAddress,
+        profilesId: profilesId,
       },
     ])
     .single();
