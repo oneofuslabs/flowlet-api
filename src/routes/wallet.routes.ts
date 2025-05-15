@@ -58,8 +58,8 @@ router.post("/", async (
   });
 
 
-  //0.1USDC airdrop
-  const tokenAmount = 0.1 * Math.pow(10, 6); // 0.1 usdc
+  //0.02USDC airdrop
+  const tokenAmount = 0.02 * Math.pow(10, 6); // 0.1 usdc
   const mint = new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU");
   const fromATA = await getAssociatedTokenAddress(mint, serviceProviderKeypair.publicKey);
   const tx = new Transaction().add(
