@@ -45,3 +45,19 @@ export const saveStake = async ({
 
   return data;
 };
+
+export const getStakeByUserAndStakeId = async (userId: string, stakeId: string) => {
+  const { data, error } = await getSupabase()
+    .from("stakechain")
+    .select("*")
+    .eq("profilesId", userId)
+    .eq("id", stakeId)
+    .single();
+
+  if (error) {
+    console.error("getStakeByUserAndStakeId error:", error);
+    throw error;
+  }
+
+  return data;
+};

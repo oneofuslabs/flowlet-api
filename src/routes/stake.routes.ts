@@ -1,7 +1,7 @@
 import { Response, Router } from "express";
 import { decrypt } from "../utils/wallet";
 import { getWalletByUserId } from "../services/wallet.service";
-import { saveStake } from "../services/stake.service";
+import { saveStake, getStakeByUserAndStakeId } from "../services/stake.service";
 
 import {
   Connection,
@@ -30,7 +30,7 @@ router.post("/deposit", async (
   const publicKey = new PublicKey(wallet.walletPublicKey);
   const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'base64');
   const privateKey = decrypt(wallet.walletPrivateKeyHash, key);
-  const userKeypair = Keypair.fromSecretKey(bs58.decode(privateKey))
+  const userKeypair = Keypair.fromSecretKey(bs58.decode(privateKey));
   
   const amountToStake = Math.floor(amount * 1e9);
 
@@ -133,6 +133,87 @@ router.post("/deposit", async (
     userId: userId,
   });
 
+});
+
+// POST /api/v1/stake/withdraw - Stake Deactivate and Withdraw
+router.post("/withdraw", async (
+  req,
+  res: Response,
+) => {
+
+  const userId = req.body.userId;
+  const stakeId = req.body.stakeId;
+
+  const stakeData = await getStakeByUserAndStakeId(userId, stakeId);
+  const wallet = await getWalletByUserId(userId);
+
+  // kontrol
+  if( stakeData.walletAddress === wallet.walletPublicKey ){
+    const publicKey = new PublicKey(wallet.walletPublicKey);
+    const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'base64');
+    const privateKey = decrypt(wallet.walletPrivateKeyHash, key);
+    const userKeypair = Keypair.fromSecretKey(bs58.decode(privateKey));
+
+    const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+    const stakeAccount = stakeData.stakeAccount;
+
+    // deactivate et
+    const deactivateTx = StakeProgram.deactivate({
+      stakePubkey: new PublicKey(stakeAccount),
+      authorizedPubkey: publicKey,
+    });
+    const deactivateTxId = await sendAndConfirmTransaction(connection, deactivateTx, [userKeypair]);
+    console.log("Stake deactivated. Tx:", deactivateTxId);
+
+    // balance kontrol
+    const balance = await connection.getBalance(new PublicKey(stakeAccount));
+    console.log("Stake account balance:", balance / LAMPORTS_PER_SOL);
+
+    // stake inactive olduktan sonra withdraw edilmemisse tekrar delegate edilebilir
+    await saveStake({
+      userId: userId,
+      walletAddress: wallet.walletPublicKey,
+      tokenName: "SOL",
+      tokenAddress: "So11111111111111111111111111111111111111112",
+      stakeAccount: stakeData.stakeAccount,
+      validator: stakeData.validator,
+      amount: stakeData.amount,
+      status: "deactivated",
+      txHash: deactivateTxId,
+    });
+
+    // withdraw
+    const withdrawTx = StakeProgram.withdraw({
+      stakePubkey: new PublicKey(stakeAccount),
+      authorizedPubkey: publicKey,
+      toPubkey: publicKey,
+      lamports: balance,
+    });
+  
+    const withdrawTxId = await sendAndConfirmTransaction(connection, withdrawTx, [userKeypair]);
+    console.log("Stake withdrawn. Tx:", withdrawTxId);
+
+    await saveStake({
+      userId: userId,
+      walletAddress: wallet.walletPublicKey,
+      tokenName: "SOL",
+      tokenAddress: "So11111111111111111111111111111111111111112",
+      stakeAccount: stakeData.stakeAccount,
+      validator: stakeData.validator,
+      amount: stakeData.amount,
+      status: "withdrawn",
+      txHash: withdrawTxId,
+    });
+
+    return res.status(200).json({
+      userId: userId,
+    });
+
+  } else {
+    return res
+        .status(400)
+        .json({ message: "not match", });
+  }
 
 });
 
