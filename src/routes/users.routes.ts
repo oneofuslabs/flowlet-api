@@ -63,7 +63,8 @@ router.get("/config", async (
       //const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
       const connection = new Connection(process.env.HELIUS_HTTP_KEY!, "confirmed");
       const ata = await getAssociatedTokenAddress(
-        new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
+        //new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
+        new PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"),
         new PublicKey("DG34bJWRt5CM2dVdi6b9mXzmMZRmBPhEm3UcUNEhNnab"),
       );
       const accountInfo = await getAccount(connection, ata);
@@ -85,7 +86,7 @@ router.get("/config", async (
           },
           {
             currency: "USDC",
-            amount: balanceUSDC * 100,
+            amount: balanceUSDC,
           },
         ],
       };
