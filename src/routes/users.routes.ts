@@ -65,7 +65,7 @@ router.get("/config", async (
       const ata = await getAssociatedTokenAddress(
         //new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
         new PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"),
-        new PublicKey("DG34bJWRt5CM2dVdi6b9mXzmMZRmBPhEm3UcUNEhNnab"),
+        new PublicKey(wallet.walletPublicKey),
       );
       const accountInfo = await getAccount(connection, ata);
       const balanceUSDC = Number(accountInfo.amount) / 10 ** 6;
