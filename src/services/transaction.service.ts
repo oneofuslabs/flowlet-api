@@ -6,21 +6,18 @@ export const getAllTransactions = async (publicKey: string) => {
     .select("*")
     .eq("walletAddress", publicKey)
     .order("created_at", { ascending: false })
-  console.log({tradeData});
 
   const { data:transferData } = await getSupabase()
     .from("transfer")
     .select("*")
     .eq("fromWallet", publicKey)
     .order("created_at", { ascending: false })
-  console.log({transferData});
 
   const { data:stakeData } = await getSupabase()
     .from("stake")
     .select("*")
     .eq("walletAddress", publicKey)
     .order("created_at", { ascending: false })
-  console.log({stakeData});
 
   const buildTxLink = (txHash: string) =>
     `https://explorer.solana.com/tx/${txHash}?cluster=devnet`;
