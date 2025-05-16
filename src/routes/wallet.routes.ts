@@ -50,7 +50,16 @@ router.post("/", async (
   });
 
   // USDC icin ATA olustur
-  const usdcATA = await ensureTokenAccount({
+  const usdcDevATA = await ensureTokenAccount({
+    connection,
+    mint: new PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr"),
+    owner: walletKeypair.publicKey,
+    payer: serviceProviderKeypair.publicKey,
+    signer: serviceProviderKeypair,
+  });
+
+  // USDC icin ATA olustur
+  await ensureTokenAccount({
     connection,
     mint: new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
     owner: walletKeypair.publicKey,
@@ -60,11 +69,12 @@ router.post("/", async (
 
 
   //0.02USDC airdrop
-  const tokenAmount = 0.02 * Math.pow(10, 6); // 0.1 usdc
-  const mint = new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU");
+  const tokenAmount = 5 * Math.pow(10, 6); // 0.1 usdc
+  //const mint = new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU");
+  const mint = new PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr");
   const fromATA = await getAssociatedTokenAddress(mint, serviceProviderKeypair.publicKey);
   const tx = new Transaction().add(
-    createTransferInstruction(fromATA, usdcATA, serviceProviderKeypair.publicKey, tokenAmount)
+    createTransferInstruction(fromATA, usdcDevATA, serviceProviderKeypair.publicKey, tokenAmount)
   );
   const sig = await sendAndConfirmTransaction(connection, tx, [serviceProviderKeypair]);
   console.log(sig);
