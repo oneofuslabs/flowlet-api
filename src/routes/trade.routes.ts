@@ -192,7 +192,7 @@ router.post("/swap", async (
     });
 
     return res.status(200).json({
-      txHashlink: transactionHashLink,
+      txHashLink: transactionHashLink,
     });
 
   } catch (err) {

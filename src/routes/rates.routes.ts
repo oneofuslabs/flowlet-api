@@ -16,7 +16,8 @@ router.get("/", async (
     },
     "usd-coin": {
       "tokenName": "USDC",
-      "tokenAddress": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      //"tokenAddress": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      "tokenAddress": "Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr",
     },
   }
   const data = await getRates(coins);
