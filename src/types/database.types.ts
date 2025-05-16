@@ -34,6 +34,7 @@ export interface Transfer {
   amount: number | null;
   txHash: string | null;
   create_at: Date;
+  profilesId: string;
 }
 
 export interface Stake {

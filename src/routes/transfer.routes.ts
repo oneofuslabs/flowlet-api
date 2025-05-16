@@ -1,7 +1,7 @@
 import { Response, Router } from "express";
 import { saveTransfer } from "../services/transfer.service";
 import { decrypt } from "../utils/wallet";
-import { getPrivateKeyHash } from "../services/wallet.service";
+import { getWalletByUserId } from "../services/wallet.service";
 import { 
   getMint, 
   getAssociatedTokenAddress,
@@ -32,17 +32,29 @@ router.post("/token", async (
   const tokenName = req.body.tokenName;
   const tokenAddress = req.body.tokenAddress;
   const amount = req.body.amount;
+  const userId = req.body.userId;
 
+  /*
   const { data, error} = await getPrivateKeyHash(fromWallet);
   if( error ){
     console.log(error);
     return;
   }
-
   // get wallet info
   const walletPrivateKeyHash = data.walletPrivateKeyHash;
+  */
+
+  const { data: walletData, error: walletError } = await getWalletByUserId(
+    userId,
+  );
+  const wallet = walletData && walletData[0];
+
+  if (walletError || !wallet) {
+    return res.status(400).json({ message: "Wallet not found" });
+  }
+
   const key = Buffer.from(process.env.ENCRYPTION_KEY!, 'base64');
-  const privateKey = decrypt(walletPrivateKeyHash, key);
+  const privateKey = decrypt(wallet.walletPrivateKeyHash, key);
 
   //const RPC_URL = "https://api.devnet.solana.com";
   //const connection = new Connection(RPC_URL, "confirmed");
@@ -87,11 +99,15 @@ router.post("/token", async (
       tokenAddress: tokenAddress,
       amount: amount,
       txHash: sig,
+      userId: userId,
     })
   }
 
+  const txHashLink = `https://explorer.solana.com/tx/${sig}?cluster=devnet`;
+
   return res.status(200).json({
     txHash: sig,
+    txHashLink: txHashLink,
   });
 
 });
