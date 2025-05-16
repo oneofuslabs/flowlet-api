@@ -7,6 +7,7 @@ export const saveTransfer = async ({
   tokenAddress,
   amount,
   txHash,
+  userId,
 }: {
   fromWallet: string;
   toWallet: string;
@@ -14,6 +15,7 @@ export const saveTransfer = async ({
   tokenAddress: string;
   amount: number;
   txHash: string;
+  userId: string;
 }) => {
   const { data, error } = await getSupabase()
     .from("transfer")
@@ -25,6 +27,7 @@ export const saveTransfer = async ({
         tokenAddress: tokenAddress,
         amount: amount,
         txHash: txHash,
+        profilesId: userId,
       },
     ])
     .single();

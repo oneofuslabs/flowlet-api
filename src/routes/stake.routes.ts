@@ -148,11 +148,17 @@ router.post("/deposit", async (
       status: "delegated",
       txHash: delegateTxId,
     });
-  }
 
-  return res.status(200).json({
-    userId: userId,
-  });
+    const txHashLink = `https://explorer.solana.com/tx/${delegateTxId}?cluster=devnet`;
+
+    return res.status(200).json({
+      userId: userId,
+      txHashLink: txHashLink,
+    });
+
+  } else {
+    return res.status(400).json({ message: "Stake not delegated" });
+  }
 });
 
 // POST /api/v1/stake/withdraw - Stake Deactivate and Withdraw
